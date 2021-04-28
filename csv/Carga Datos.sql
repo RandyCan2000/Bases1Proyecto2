@@ -1,68 +1,61 @@
 use Proyecto2;
 
 -- Insert Regiones
-INSERT INTO region
-	(
-		SELECT distinct null, region_padre, null FROM temporal_file_3 where region_padre != ''
-    )
-;
-insert into region 
-	(
-		select null, tf3.nombre_region, r.id_region from temporal_file_3 as tf3
-		inner join region as r on r.nombre_region = tf3.region_padre
-    )
-;
+INSERT INTO region(
+SELECT distinct null, region_padre, null FROM temporal_file_3 where region_padre != ''
+);
+insert into region (
+select null, tf3.nombre_region, r.id_region from temporal_file_3 as tf3
+inner join region as r on r.nombre_region = tf3.region_padre
+);
 SELECT * FROM REGION;
 
 -- insert into pais
 	-- insert pais invento
 insert into pais (
-	select null,trim(tf1.pais_invento) as pais,tf1.poblacion_pais,tf1.area_km,tf1.capital,r.id_region from temporal_file_1 as tf1
-	inner join region as r on r.nombre_region = tf1.region_pais
-	group by pais,tf1.poblacion_pais,tf1.area_km,tf1.capital,r.id_region
-	order by pais asc	
+select null,trim(tf1.pais_invento) as pais,tf1.poblacion_pais,tf1.area_km,tf1.capital,r.id_region from temporal_file_1 as tf1
+inner join region as r on r.nombre_region = tf1.region_pais
+group by pais,tf1.poblacion_pais,tf1.area_km,tf1.capital,r.id_region
+order by pais asc	
 );
 	-- insert pais de encuestas
 insert into pais(
-	select null,trim(pais),0,0,"",null from temporal_file_2 as tf2
-	where not exists(
-		select nombre_pais from pais where nombre_pais = trim(pais)
-    )
-    group by pais
-	order by pais asc
+select null,trim(pais),0,0,"",null from temporal_file_2 as tf2
+where not exists(
+select nombre_pais from pais where nombre_pais = trim(pais))
+group by pais
+order by pais asc
 );
 	-- insert pais inventor
 insert into pais(
-	select null,trim(pais_inventor),0,0,"",null from temporal_file_1 as tf1
-    where not exists(
-		select nombre_pais from pais where nombre_pais = trim(pais_inventor)
-    )
-    group by pais_inventor
-    order by pais_inventor asc
+select null,trim(pais_inventor),0,0,"",null from temporal_file_1 as tf1
+where not exists(
+select nombre_pais from pais where nombre_pais = trim(pais_inventor))
+group by pais_inventor
+order by pais_inventor asc
 );
 	-- insert pais frontera
 insert into pais(
-	select null,trim(Frontera_con),0,0,"",null from temporal_file_1 as tf1
-	where not exists(
-		select nombre_pais from pais where nombre_pais = trim(Frontera_con)
-    )
-    group by pais_inventor
-    order by pais_inventor asc
+select null,trim(Frontera_con),0,0,"",null from temporal_file_1 as tf1
+where not exists(
+select nombre_pais from pais where nombre_pais = trim(Frontera_con))
+group by pais_inventor
+order by pais_inventor asc
 );
 
 -- insert table encuesta
 insert into encuesta (id_encuesta, nombre_encuesta)(
-	select null, nombre_encuesta from temporal_file_2 
-    group by nombre_encuesta
+select null, nombre_encuesta from temporal_file_2 
+group by nombre_encuesta
 );
 select * from encuesta;
 
 -- Insert Table preguntas
-insert into pregunta (id_pregunta,pregunta,encuesta_id)(
-	select null, trim(tf2.pregunta), e.id_encuesta from temporal_file_2 as tf2
-    inner join encuesta as e on e.nombre_encuesta = tf2.nombre_encuesta
-    group by tf2.pregunta, e.id_encuesta
-    order by tf2.pregunta asc
+insert into pregunta(
+select null, trim(tf2.pregunta), e.id_encuesta from temporal_file_2 as tf2
+inner join encuesta as e on e.nombre_encuesta = tf2.nombre_encuesta
+group by tf2.pregunta, e.id_encuesta
+order by tf2.pregunta asc
 );
 select * from pregunta;
 
