@@ -7,12 +7,11 @@
         $sql = "select nombre_profesional,count(*) no_inventos from profesional
         inner join asigna_invento av on av.profesional_id = id_profesional
         group by nombre_profesional
-        order by no_inventos desc";
+        order by no_inventos desc;";
         $result = $conn->query($sql);
         Llenar_Resultado($result);
         return;
     }
-
     function query2() {
         global $conn;
         $sql = "select 
@@ -21,7 +20,7 @@
         from pais p
         left join pais_respuesta pr on pr.pais_id = p.id_pais
         group by nombre_pais
-        order by no_Preguntas_Respondidas desc";
+        order by no_Preguntas_Respondidas desc;";
         $result = $conn->query($sql);
         Llenar_Resultado($result);
         return;
@@ -29,6 +28,8 @@
 
     function query3() {
         global $conn;
+        $sql = "SET sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';";
+        $result = $conn->query($sql);
         $sql = "(
             select p.id_pais,p.nombre_pais,p.capital_pais,p.area from pais p
             inner join frontera f on f.pais_id_1=p.id_pais
@@ -46,7 +47,7 @@
             ) and not exists(
                 select * from inventor i where i.pais_id = p.id_pais and i.nombre_inventor != ''
             )
-        ) order by area asc";
+        ) order by area asc;";
         $result = $conn->query($sql);
         Llenar_Resultado($result);
         return;

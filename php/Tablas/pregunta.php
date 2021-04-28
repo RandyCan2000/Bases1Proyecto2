@@ -54,7 +54,7 @@
                 <div class="form-group col-md-4"></div>
                 <div class="form-group col-md-4">
                     <h3><label for="RESPUESTAS_CORRECTA">Respuesta Correcta</label></h3>
-                    <select id="RESPUESTAS_CORRECTA" class="form-control bg-dark" data-style="btn-dark" data-size="8">
+                    <select id="RESPUESTAS_CORRECTA" class="form-control bg-dark text-white" data-style="btn-dark" data-size="8">
                     </select>
                 </div>
                 <div class="form-group col-md-4"></div>
@@ -130,6 +130,7 @@
                     url: `../CRUD/pregunta_crud.php?LAST_CREATE=true`,
                     async: true,
                     success: function (data) {
+                        console.log(data);
                         const id_pg = JSON.parse(data)[0].id_pregunta;
                         console.log(id_pg);
                         for (const iterator of Listado) {
@@ -145,6 +146,7 @@
                                             url: `../CRUD/pregunta_crud.php?GET_RESP_COR=true&res=${resp_cor}&let=${resp_cor.substring(0, 1).toUpperCase()}&idp=${id_pg}`,
                                             async: true,
                                             success: function (data) {
+                                                console.log(data)
                                                 //agregar Relacion entre pregunta y respuesta correcta
                                                 const idr = JSON.parse(data)[0].id_respuesta;
                                                 $.ajax({

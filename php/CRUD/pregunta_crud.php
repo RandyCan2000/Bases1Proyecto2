@@ -18,7 +18,7 @@
 
     if(isset($_GET['CREATE_RESP'])){
         global $conn;
-        $sql = "insert INTO RESPUESTA VALUES(null,'".$_GET['res']."','".$_GET['let']."',".$_GET['idp'].")";
+        $sql = "insert INTO respuesta VALUES(null,'".$_GET['res']."','".$_GET['let']."',".$_GET['idp'].")";
         $result = $conn->query($sql);
         echo json_encode($result); 
     }

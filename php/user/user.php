@@ -19,7 +19,7 @@
         <?php include('../navbar/navbar.php');?>
 
         <div class="container" id="dinamic">
-            <?php include('../consultas/Consultas.php');?>
+            <?php include('../Consultas/Consultas.php');?>
         </div>
         
         <!--Bootstrap-->
