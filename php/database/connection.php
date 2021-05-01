@@ -1,8 +1,8 @@
 <?php
-    $servername = "34.123.9.183";
+    $servername = "34.68.27.29";
     $database = "Proyecto2";
     $username = "root";
-    $password = "Intercan1";
+    $password = "Intercan3";
     // Create connection
     $conn = mysqli_connect($servername, $username,$password, $database);
     // Check connection

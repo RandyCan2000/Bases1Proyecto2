@@ -6,6 +6,7 @@
         global $conn;
         $sql = "select nombre_profesional,count(*) no_inventos from profesional
         inner join asigna_invento av on av.profesional_id = id_profesional
+        where nombre_profesional != ''
         group by nombre_profesional
         order by no_inventos desc;";
         $result = $conn->query($sql);
@@ -15,12 +16,12 @@
     function query2() {
         global $conn;
         $sql = "select 
-            nombre_pais,
-            count(pr.respuesta_id) no_Preguntas_Respondidas 
-        from pais p
-        left join pais_respuesta pr on pr.pais_id = p.id_pais
-        group by nombre_pais
-        order by no_Preguntas_Respondidas desc;";
+        nombre_pais,
+        count(pr.respuesta_id) no_Preguntas_Respondidas 
+    from pais p
+    left join pais_respuesta pr on pr.pais_id = p.id_pais
+    group by nombre_pais
+    order by no_Preguntas_Respondidas desc;";
         $result = $conn->query($sql);
         Llenar_Resultado($result);
         return;
@@ -47,7 +48,7 @@
             ) and not exists(
                 select * from inventor i where i.pais_id = p.id_pais and i.nombre_inventor != ''
             )
-        ) order by area asc;";
+        ) order by area desc;";
         $result = $conn->query($sql);
         Llenar_Resultado($result);
         return;
@@ -67,7 +68,8 @@
     function query5() {
         global $conn;
         $sql = "select * from (
-            select nombre_profesional,nombre_area,salario_profesional from profesional p
+            select nombre_profesional,nombre_area,salario_profesional
+            from profesional p
             inner join profe_area pa on pa.profesional_id = p.id_profesional
             inner join area a on a.id_area = pa.area_id
             order by nombre_area asc
@@ -81,7 +83,7 @@
             ) avgtable
             where avgtable.nombre_area = SubTabla.nombre_area
             group by nombre_area
-        ) order by SubTabla.nombre_area asc";
+        ) order by SubTabla.nombre_area asc;";
         $result = $conn->query($sql);
         Llenar_Resultado($result);
         return;
@@ -93,7 +95,7 @@
         inner join pais_respuesta rp on rp.pais_id = p.id_pais
         inner join respuesta_correcta rc on rc.respuesta_id = rp.respuesta_id
         group by p.nombre_pais
-        order by Aciertos desc";
+        order by Aciertos desc;";
         $result = $conn->query($sql);
         Llenar_Resultado($result);
         return;
@@ -108,7 +110,7 @@
         inner join area a on a.id_area = pa.area_id
         where a.nombre_area='Óptica'
         group by i.nombre_invento,pr.nombre_profesional
-        order by i.nombre_invento";
+        order by i.nombre_invento;";
         $result = $conn->query($sql);
         Llenar_Resultado($result);
         return;
@@ -117,8 +119,9 @@
     function query8() {
         global $conn;
         $sql = "select substr(nombre_pais,1,1) as Inicial_pais,sum(area) Sumatoria_area from pais
+        where nombre_pais != ''
         group by Inicial_pais
-        order by Inicial_pais asc";
+        order by Inicial_pais asc;";
         $result = $conn->query($sql);
         Llenar_Resultado($result);
         return;
@@ -129,7 +132,7 @@
         $sql = "select nombre_invento,nombre_inventor from inventor inve
         inner join inventado inv on inv.inventor_id = inve.id_inventor
         inner join invento i on inv.invento_id = i.id_invento
-        where upper(nombre_inventor) like 'BE%'";
+        where upper(nombre_inventor) like 'BE%';";
         $result = $conn->query($sql);
         Llenar_Resultado($result);
         return;
@@ -141,7 +144,7 @@
         inner join inventado inv on inv.inventor_id = inve.id_inventor
         inner join invento i on inv.invento_id = i.id_invento
         where (upper(nombre_inventor) like 'B%R' or upper(nombre_inventor) like 'B%N') and
-        (i.anio_invento >= 1801 and i.anio_invento <= 1900)";
+        (i.anio_invento >= 1801 and i.anio_invento <= 1900);";
         $result = $conn->query($sql);
         Llenar_Resultado($result);
         return;
@@ -157,7 +160,7 @@
             group by Pais
         ) subcon
         where subcon.No_Fronteras>7
-        order by subcon.area desc";
+        order by subcon.area desc;";
         $result = $conn->query($sql);
         Llenar_Resultado($result);
         return;
@@ -169,7 +172,7 @@
             select nombre_invento ,length(nombre_invento) size from invento
             where upper(nombre_invento) like 'L%'
         ) subcon
-        where subcon.size = 4";
+        where subcon.size = 4;";
         $result = $conn->query($sql);
         Llenar_Resultado($result);
         return;
@@ -178,12 +181,12 @@
     function query13() {
         global $conn;
         $sql = "select 
-            nombre_profesional,
-            salario_profesional,
-            comision,
-            (salario_profesional + comision) SueldoTotal 
-        from profesional
-        where comision > 0.25*salario_profesional";
+        nombre_profesional,
+        salario_profesional,
+        comision,
+        (salario_profesional + comision) SueldoTotal 
+    from profesional
+    where comision > 0.25*salario_profesional;";
         $result = $conn->query($sql);
         Llenar_Resultado($result);
         return;
@@ -191,15 +194,19 @@
 
     function query14() {
         global $conn;
-        $sql = "select nombre_encuesta, count(nombre_pais) Cantidad_Paises from(
-            select e.nombre_encuesta, pa.nombre_pais from encuesta e
-            inner join pregunta p on p.encuesta_id = e.id_encuesta
-            inner join respuesta r on r.pregunta_id = p.id_pregunta
-            inner join pais_respuesta rp on rp.respuesta_id = r.id_respuesta
-            inner join pais pa on pa.id_pais = rp.pais_id
-            group by e.nombre_encuesta, pa.nombre_pais
-        ) subcon
-        group by nombre_encuesta";
+        $sql = "select nombre_encuesta,sum(cant_resp) Paises_respondida from(
+            select nombre_encuesta,nombre_pais,cant_resp from(
+                select e.nombre_encuesta,p.pregunta,r.respuesta,rp.pais_id,pa.nombre_pais,count(*) Cant_resp from encuesta e
+                inner join pregunta p on p.encuesta_id = e.id_encuesta
+                inner join respuesta r on r.pregunta_id = p.id_pregunta
+                inner join pais_respuesta rp on rp.respuesta_id = r.id_respuesta
+                inner join pais pa on pa.id_pais = rp.pais_id
+                group by e.nombre_encuesta,p.pregunta,r.respuesta,rp.pais_id
+                order by Cant_resp desc
+            ) subcon1
+            group by nombre_encuesta,nombre_pais,cant_resp
+        ) subcon2
+        group by nombre_encuesta;";
         $result = $conn->query($sql);
         Llenar_Resultado($result);
         return;
@@ -215,7 +222,7 @@
             group by r.nombre_region
         )
         and nombre_pais != ''
-        order by nombre_pais desc";
+        order by nombre_pais desc;";
         $result = $conn->query($sql);
         Llenar_Resultado($result);
         return;
@@ -227,7 +234,7 @@
             (
             select p.nombre_profesional,a.nombre_area from area a
             inner join profesional p on p.id_profesional = a.profesional_id
-            where a.nombre_area != 'TODAS'
+            where a.id_area != 'TODAS'
             )
             union
             (
@@ -250,7 +257,8 @@
             inner join area a on a.id_area = pa.area_id
             where nombre_inventor = 'Pasteur'
         )
-        order by nombre_area asc";
+        order by nombre_area asc;
+        ";
         $result = $conn->query($sql);
         Llenar_Resultado($result);
         return;
@@ -266,7 +274,7 @@
             inner join inventado inve on inve.invento_id = i.id_invento
             inner join inventor inv on inve.inventor_id = inv.id_inventor
             where nombre_inventor = 'Benz'
-        )";
+        );";
         $result = $conn->query($sql);
         Llenar_Resultado($result);
         return;
@@ -274,10 +282,10 @@
 
     function query18() {
         global $conn;
-        $sql = "select nombre_profesional,count(*) no_inventos from profesional
-        inner join asigna_invento av on av.profesional_id = id_profesional
-        group by nombre_profesional
-        order by no_inventos desc";
+        $sql = "select nombre_pais,poblacion from pais p 
+        inner join frontera f on f.pais_id_1 = p.id_pais
+        where f.pais_id_2 is null
+        and p.area >= (select area from pais where nombre_pais = 'Japón');";
         $result = $conn->query($sql);
         Llenar_Resultado($result);
         return;
@@ -288,7 +296,7 @@
         $sql = "select p.nombre_pais,p2.nombre_pais as frontera from pais p
         inner join frontera f on f.pais_id_1 = p.id_pais
         inner join pais p2 on p2.id_pais = f.pais_id_2
-        where p.nombre_pais != '' and p2.nombre_pais != ''";
+        where p.nombre_pais != '' and p2.nombre_pais != '';";
         $result = $conn->query($sql);
         Llenar_Resultado($result);
         return;
@@ -297,7 +305,7 @@
     function query20() {
         global $conn;
         $sql = "select nombre_profesional,salario_profesional,comision from profesional
-        where salario_profesional > 2*comision";
+        where salario_profesional > 2*comision and comision>0;";
         $result = $conn->query($sql);
         Llenar_Resultado($result);
         return;
